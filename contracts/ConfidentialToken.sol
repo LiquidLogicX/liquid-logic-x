@@ -2,15 +2,19 @@
 pragma solidity ^0.8.27;
 
 import {Ownable2Step, Ownable} from "@openzeppelin/contracts/access/Ownable2Step.sol";
-import {FHE, externalEuint64, euint64} from "@fhevm/solidity/lib/FHE.sol";
+import {FHE, externalEuint64, euint64, ebool} from "@fhevm/solidity/lib/FHE.sol";
 import {ZamaEthereumConfig} from "@fhevm/solidity/config/ZamaConfig.sol";
 import {ERC7984} from "@openzeppelin/confidential-contracts/token/ERC7984/ERC7984.sol";
 
-/// @title ConfidentialToken — Liquid Logic X Milestone 1
-/// @notice Confidential ERC7984 token with owner mint and encrypted transfers.
-/// @dev Uses ZamaEthereumConfig for Sepolia-compatible FHE setup. Does not
-///      fork or wrap fhevm/solidity or openzeppelin/confidential-contracts packages.
+/// @title ConfidentialToken — Liquid Logic X
+/// @notice Confidential ERC7984 token with mint/transfer and threshold proofs.
+/// @dev Milestone 2: prove balance >= threshold by granting ACL on the encrypted
+///      comparison result (ebool), not on the balance itself. Uses only audited
+///      FHE.ge / FHE.allow from fhevm solidity — no custom cryptography.
 contract ConfidentialToken is ZamaEthereumConfig, ERC7984, Ownable2Step {
+    /// @dev Last threshold-clearance proof for (holder, verifier).
+    mapping(address holder => mapping(address verifier => ebool proof)) private _thresholdProofs;
+
     constructor(
         address owner_,
         uint64 initialAmount,
@@ -34,5 +38,23 @@ contract ConfidentialToken is ZamaEthereumConfig, ERC7984, Ownable2Step {
         bytes calldata inputProof
     ) external onlyOwner returns (euint64 transferred) {
         return _mint(to, FHE.fromExternal(encryptedAmount, inputProof));
+    }
+
+    /// @notice Prove msg.sender's balance clears `threshold` without revealing the balance.
+    /// @dev Computes ebool = (balance >= threshold) via FHE.ge, then grants `verifier`
+    ///      ACL to decrypt that ebool only — never the balance handle.
+    function proveThreshold(address verifier, uint64 threshold) external returns (ebool clears) {
+        require(verifier != address(0), "verifier=0");
+        euint64 balance = confidentialBalanceOf(msg.sender);
+        clears = FHE.ge(balance, threshold);
+        FHE.allowThis(clears);
+        FHE.allow(clears, verifier);
+        FHE.allow(clears, msg.sender);
+        _thresholdProofs[msg.sender][verifier] = clears;
+    }
+
+    /// @notice Stored threshold-clearance proof for (holder, verifier), if any.
+    function thresholdProofOf(address holder, address verifier) external view returns (ebool) {
+        return _thresholdProofs[holder][verifier];
     }
 }
