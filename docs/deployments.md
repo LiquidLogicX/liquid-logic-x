@@ -29,3 +29,32 @@ FHE operations use Zama Gateway Testnet (`10901`, `rpc.testnet.zama.org`, relaye
 - Constructor args: `owner=deployer`, `initialAmount=1000000`, `name=Liquid Logic X Token`, `symbol=LLX`, `contractURI=https://example.com/llx`
 - Deploy uses `PRIVATE_KEY` and `SEPOLIA_RPC_URL` from environment (never committed)
 - No private keys or RPC credentials are stored in this repo
+
+## ConfidentialToken (Milestone 2) — Ethereum Sepolia
+
+| Field | Value |
+|-------|-------|
+| Network | Ethereum Sepolia (`11155111`) |
+| Contract | `0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a` |
+| Tx hash | `0xd7454a8a115dad5b2b1843449b48c75dc7c5182683a5ed61363385e1b1e16841` |
+| Block | `11683621` |
+| Gas used | `2476676` |
+| Deployer | `0x0B6aE190787C84804a40419550B1577b4d261201` |
+| Etherscan | https://sepolia.etherscan.io/address/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a |
+| Tx | https://sepolia.etherscan.io/tx/0xd7454a8a115dad5b2b1843449b48c75dc7c5182683a5ed61363385e1b1e16841 |
+| Sourcify | https://repo.sourcify.dev/11155111/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a |
+| Routescan | https://routescan.io/address/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a?chainid=11155111 |
+
+### Verification
+
+- **Sourcify:** full match (creation + runtime) via Server API v2 on 2026-09-11; matchId `49509322`.
+- **Etherscan:** NOT verified yet — no `ETHERSCAN_API_KEY` in deploy env; Sourcify external mirror hit "Daily limit of 500 source code submissions reached".
+- **Routescan:** ABI returned OK after Sourcify external verification.
+- **Blockscout:** still pending/not verified at time of write.
+
+### Notes
+
+- Constructor args same as M1: `owner=deployer`, `initialAmount=1000000`, `name=Liquid Logic X Token`, `symbol=LLX`, `contractURI=https://example.com/llx`
+- M1 address remains `0x0b576f4bBd7862279a0bE1982eE71f910eBDB3ac`
+- Deploy uses `PRIVATE_KEY` and `SEPOLIA_RPC_URL` from environment (never committed)
+- No private keys or RPC credentials are stored in this repo
