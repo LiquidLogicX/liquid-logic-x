@@ -1,79 +1,201 @@
-# SPEC.md — Liquid Logic X
+# Liquid Logic X — Specification
 
-## What we are proving
+**Status:** Draft v0.1 · September 10, 2026
+**Repo:** `LiquidLogicX/liquid-logic-x`
+**Stack:** Solidity + Zama fhEVM · Ethereum Sepolia (11155111) · Zama Gateway Testnet (10901)
 
-One thing only: **an onchain token balance can be encrypted, and its holder can grant a
-specific address permission to read it.**
+---
 
-If that works, there is a product here. If it doesn't, we stop. This spec exists to answer
-that question in days, not months.
+## 1. What this is
 
-## Non-goals
+A confidential treasury layer for AI agent fleets.
 
-Do not build these. If a task seems to require one, stop and report.
+A principal (a person or company running agents) funds each agent with an **encrypted
+spending allowance**. Agents pay for services from that allowance. The contract enforces
+the limit on-chain, but the allowance, the balance, and every payment amount stay
+encrypted. Nobody — including the service the agent is paying — can read them.
 
-- No real assets. No mainnet. Testnet only.
-- No custody of anyone's funds.
-- No bridge, no cross-chain messaging.
-- **No custom cryptography.** Use an audited library. If you find yourself implementing a
-  scheme rather than calling one, stop.
-- No UI beyond what is needed to demonstrate the two states.
-- No token, no launch, no marketing surface.
+The principal holds a view key and can audit everything at any time. Allowances can be
+revoked instantly.
 
-## Milestone 0 — Feasibility check (do this first, report before coding)
+---
 
-Before writing any contract, confirm the tooling actually exists and works today.
+## 2. The problem
 
-Deliverable: a short written report in a PR, answering:
+Autonomous agents are the first user class that is natively on-chain. They already hold
+wallets, already pay per-call for services, and already settle without a human in the
+loop. They are also completely exposed.
 
-1. Where is Zama's fhEVM (or an equivalent audited FHE/zk confidential-token library)
-   actually deployed and usable right now? Name the chain, RPC endpoint, faucet, and SDK
-   version.
-2. Can a fresh Hardhat project compile and deploy their example encrypted ERC-20 to that
-   network? Yes or no, with the command output.
-3. What does it cost in testnet gas, and is the faucet sufficient?
+A public chain publishes an agent's entire operating picture:
 
-**Note on chain choice:** FHE contracts need the coprocessor deployed on the target chain.
-That almost certainly means building on whatever network the library supports, **not**
-Robinhood Chain. Do not attempt to deploy FHE contracts to an arbitrary Arbitrum Orbit
-chain. If Milestone 0 shows no public testnet supports this, say so and stop — that is a
-valid and useful result.
+| Leaked | Consequence |
+|---|---|
+| Wallet balance | Counterparties can price against a visible budget |
+| Every payment amount | Service rates and negotiated discounts become public |
+| Payment frequency | Burn rate and scaling plans are readable |
+| Counterparty addresses | The fleet's vendor stack and dependencies are mapped |
 
-## Milestone 1 — Confidential balance
+For a single hobby agent this is harmless. For a company running a fleet it is a
+continuous disclosure of budget, strategy and supplier relationships to competitors.
 
-An encrypted ERC-20 with `mint`, `transfer`, and an encrypted balance.
+### Why encryption specifically
 
-**Acceptance:** deploy to testnet, mint to an address, and show that the block explorer
-displays no readable balance for that address. Screenshot in the PR.
+The important property is not secrecy for its own sake. It is this:
 
-## Milestone 2 — Viewing key
+> **A spending cap can be enforced without revealing the cap.**
 
-The holder can grant a chosen address permission to decrypt their balance.
+Today a principal has two options, and both are bad. Publish the budget on-chain and
+enforce it trustlessly but publicly. Or enforce it off-chain in a custodial service and
+lose the on-chain guarantee entirely. FHE is what collapses that trade-off — the
+contract computes on the encrypted allowance and rejects an overspend without ever
+decrypting it.
 
-**Acceptance:** address X, granted permission, reads the balance successfully. Address Y,
-not granted, cannot. Both cases covered by a passing test.
+That is the whole reason this project exists. Any feature that does not depend on that
+property does not belong here.
 
-## Milestone 3 — Minimal demo page
+---
 
-A single static page: connect wallet, show your own balance decrypted, show another
-address's balance as ciphertext. Plain HTML is fine.
+## 3. Who it is for
 
-Deploy to the Vercel project. Password protection stays on.
+**Primary:** operators running more than one agent with a real budget — agent fleet
+companies, trading-agent operators, automated research and data pipelines.
 
-## Working rules
+**Secondary:** service providers selling to agents, who would rather not publish their
+per-customer pricing on a public ledger.
 
-- Branch and PR for everything. **Never push to main.**
-- One PR per milestone. Small and reviewable.
-- Every contract needs tests. A milestone without passing tests is not done.
-- **Report blockers instead of working around them.** If a library doesn't do what this
-  spec assumes, that is information, not an obstacle to route around.
-- No secrets in the repo. No API keys, no private keys, no `.env` committed.
-- Testnet keys only. Never a key that has touched real funds.
+**Not the user:** individual hobbyist agents with trivial balances. There is nothing
+worth hiding and the FHE overhead is not worth paying.
 
-## Open questions for the human
+---
 
-Do not decide these yourself:
+## 4. Scope
 
-- Which chain this ultimately targets.
-- Whether this becomes a product or stays a demo.
-- Anything touching real assets, securities, or regulated instruments.
+### In scope
+
+- Encrypted per-agent allowances issued by a principal
+- Spend against an allowance with on-chain cap enforcement, amounts encrypted
+- View-key grants so the principal (and any auditor they nominate) can decrypt
+- Instant revocation of an allowance
+- Top-up of an existing allowance without revealing the new total
+
+### Explicitly out of scope (v1)
+
+- **Per-query micropayments.** Each encrypted input costs a proof and Gateway
+  round-trips add latency. Sub-cent per-call payments are the wrong shape for FHE. Those
+  net off-chain and settle here in batches.
+- **Bridging.** No cross-chain movement. Sepolia only.
+- **A token.** Funding the project is a separate decision from the protocol design and
+  must not distort it.
+- **Mainnet.** See §8 on licensing.
+
+---
+
+## 5. Architecture
+
+```
+Principal (human / company)
+    │  funds + sets encrypted allowance
+    ▼
+ConfidentialTreasury ──── grants view key ────► Auditor
+    │
+    │  encrypted allowance per agent
+    ▼
+Agent A     Agent B     Agent C
+    │
+    │  spend(recipient, encryptedAmount)
+    ▼
+Service provider  ◄── receives value, cannot read the payer's balance
+```
+
+### Built on
+
+Milestone 1 already merged the two primitives this needs:
+
+- **Encrypted balance** (`euint` confidential token, ERC7984-shaped)
+- **ACL** — an address with no grant cannot read a balance. Tested: 4/4 passing,
+  including the deny case.
+
+Deployed and Sourcify-verified on Sepolia at
+`0x0b576f4bBd7862279a0bE1982eE71f910eBDB3ac`.
+
+### Core interface (draft)
+
+```solidity
+function setAllowance(address agent, externalEuint64 amount, bytes calldata proof) external;
+function topUp(address agent, externalEuint64 amount, bytes calldata proof) external;
+function revoke(address agent) external;
+
+function spend(address to, externalEuint64 amount, bytes calldata proof) external;
+
+function grantView(address auditor, address agent) external;
+function allowanceOf(address agent) external view returns (euint64);
+```
+
+`spend` must fail closed. An agent attempting to exceed its allowance results in a
+no-op transfer, not a revert that leaks the comparison result — the failure itself is
+information.
+
+---
+
+## 6. The USDC problem
+
+x402 and the existing agent payment rails settle in USDC. A confidential token does not
+interoperate with plaintext USDC. This is a real gap and it needs an answer in the
+design, not a discovery later.
+
+**v1 answer:** wrap at the edges. A principal deposits a plaintext asset, receives
+confidential balance inside the treasury, and unwraps on exit. Confidentiality holds
+for everything that happens *inside* — which is where the allowance logic, the spending
+and the counterparty relationships live. The deposit and withdrawal are visible.
+
+That leaks the fleet's total budget at funding time while hiding its allocation and
+spending. An honest partial win. Full end-to-end confidentiality would require the
+service providers to accept the confidential asset directly, which is a chicken-and-egg
+problem not worth fighting in v1.
+
+---
+
+## 7. Milestones
+
+| # | Deliverable | Status |
+|---|---|---|
+| 0 | Feasibility — Zama fhEVM on Sepolia | ✅ Done |
+| 1 | Confidential balance + ACL, 4/4 tests | ✅ Merged (PR #2) |
+| 2 | Sepolia deploy + Sourcify verification + deploy docs | ✅ Merged (PR #3) |
+| 3 | `setAllowance` / `spend` / `revoke` + tests | Next |
+| 4 | View-key grants and auditor flow | |
+| 5 | Wrap / unwrap at the plaintext boundary | |
+| 6 | Reference agent — an agent that pays from an allowance end to end | |
+
+Milestone 6 is the one that proves the thesis. Everything before it is plumbing.
+
+---
+
+## 8. Constraints and open questions
+
+**Licensing.** Zama's libraries are BSD-3-Clause-Clear — free for development,
+research, prototyping and experimentation only. Any commercial use requires a patent
+licence from Zama (hello@zama.ai). This must be resolved before any revenue product or
+mainnet deployment. It is not a blocker for milestones 3–6.
+
+**Cost.** 1 $ZAMA per encrypted input proof, 75/day from the testnet faucet. Enough for
+development; a constraint on test suite size.
+
+**Open — how are allowances denominated?** A stable unit is required for a spending cap
+to mean anything, which points back to §6.
+
+**Open — multi-principal.** Can one agent hold allowances from several principals? It
+is a natural fit for agents working for more than one client, and it complicates the
+ACL model considerably. Deferred past v1.
+
+**Open — key management.** If the principal loses their view key, the audit trail is
+unreadable. Recovery design is undecided.
+
+---
+
+## 9. Non-goals
+
+This project is not a general privacy chain, not a mixer, and not a compliance-evasion
+tool. Every balance in the system is readable by the principal who funded it and by any
+auditor they nominate. Confidentiality here is directional — hidden from competitors
+and counterparties, transparent to the owner.
