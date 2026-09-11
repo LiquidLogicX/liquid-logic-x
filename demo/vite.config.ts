@@ -1,11 +1,10 @@
 import { defineConfig } from "vite";
 
-// Deployed under GitHub Pages (or any static host) at /demo/
+// GitHub project Pages site is served under /liquid-logic-x/
+// so the demo lives at /liquid-logic-x/demo/
 export default defineConfig({
-  base: "/demo/",
+  base: "/liquid-logic-x/demo/",
   server: {
-    // FHE WASM can fall back to single-thread without COOP/COEP;
-    // enable isolation when possible for SharedArrayBuffer.
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "require-corp",
