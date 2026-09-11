@@ -31,7 +31,13 @@ const config: HardhatUserConfig = {
   namedAccounts: {
     deployer: 0,
   },
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://sourcify.dev/server",
+    browserUrl: "https://repo.sourcify.dev",
+  },
   etherscan: {
+    enabled: false,
     apiKey: {
       sepolia: process.env.ETHERSCAN_API_KEY || vars.get("ETHERSCAN_API_KEY", ""),
     },
