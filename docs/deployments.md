@@ -11,14 +11,14 @@
 | Gas used | `2400130` |
 | Deployer | `0x0B6aE190787C84804a40419550B1577b4d261201` |
 | Commit SHA (main tip at deploy) | `d16e5d3393c9bf83fd2ea42e063bdcf81f997360` |
-| Etherscan | https://sepolia.etherscan.io/address/0x0b576f4bBd7862279a0bE1982eE71f910eBDB3ac |
+| Etherscan | https://sepolia.etherscan.io/address/0x0b576f4bBd7862279a0bE1982eE71f910eBDB3ac#code |
 | Tx | https://sepolia.etherscan.io/tx/0xe4765a82f4d229bb5982119954c3469a8b0d86d5cd9564c91a1d3dc39211ee63 |
 | Sourcify | https://repo.sourcify.dev/11155111/0x0b576f4bBd7862279a0bE1982eE71f910eBDB3ac |
 
 ### Verification
 
 - **Sourcify:** verified (creation + runtime match) via Sourcify Server API v2 on 2026-09-11. Hardhat's built-in `hardhat verify` still targets Sourcify API v1 (turned off), so verification was submitted with the v2 `/v2/verify/{chainId}/{address}` endpoint using the Hardhat build-info std JSON input.
-- **TODO — Etherscan:** verify on Sepolia Etherscan when `ETHERSCAN_API_KEY` is available in the deploy environment. Daily source-submission limit / missing key blocked Etherscan during this deploy.
+- **Etherscan:** verified on Sepolia Etherscan on 2026-09-11 via Etherscan API v2 (`verifysourcecode` with `solidity-standard-json-input`). Contract tab: https://sepolia.etherscan.io/address/0x0b576f4bBd7862279a0bE1982eE71f910eBDB3ac#code
 
 ### FHE / Zama context
 
@@ -40,7 +40,7 @@ FHE operations use Zama Gateway Testnet (`10901`, `rpc.testnet.zama.org`, relaye
 | Block | `11683621` |
 | Gas used | `2476676` |
 | Deployer | `0x0B6aE190787C84804a40419550B1577b4d261201` |
-| Etherscan | https://sepolia.etherscan.io/address/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a |
+| Etherscan | https://sepolia.etherscan.io/address/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a#code |
 | Tx | https://sepolia.etherscan.io/tx/0xd7454a8a115dad5b2b1843449b48c75dc7c5182683a5ed61363385e1b1e16841 |
 | Sourcify | https://repo.sourcify.dev/11155111/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a |
 | Routescan | https://routescan.io/address/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a?chainid=11155111 |
@@ -48,9 +48,9 @@ FHE operations use Zama Gateway Testnet (`10901`, `rpc.testnet.zama.org`, relaye
 ### Verification
 
 - **Sourcify:** full match (creation + runtime) via Server API v2 on 2026-09-11; matchId `49509322`.
-- **Etherscan:** NOT verified yet — no `ETHERSCAN_API_KEY` in deploy env; Sourcify external mirror hit "Daily limit of 500 source code submissions reached".
-- **Routescan:** ABI returned OK after Sourcify external verification.
-- **Blockscout:** still pending/not verified at time of write.
+- **Etherscan:** verified on Sepolia Etherscan on 2026-09-11 via Etherscan API v2 (`verifysourcecode` with Hardhat build-info std JSON). Contract name `ConfidentialToken`, compiler `v0.8.27+commit.40a35a09`. Contract tab: https://sepolia.etherscan.io/address/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a#code
+- **Routescan:** verified (ABI available) after Sourcify external verification.
+- **Blockscout:** was pending at first write; re-check if needed for the grant packet.
 
 ### Notes
 
