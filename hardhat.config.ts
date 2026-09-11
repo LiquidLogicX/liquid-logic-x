@@ -11,19 +11,35 @@ import "solidity-coverage";
 
 import "./tasks/accounts";
 
-// Run 'npx hardhat vars setup' to see the list of variables that need to be set
-
 const MNEMONIC: string = vars.get("MNEMONIC", "test test test test test test test test test test test junk");
-const INFURA_API_KEY: string = vars.get("INFURA_API_KEY", "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz");
+
+function sepoliaAccounts(): string[] | { mnemonic: string } {
+  const pk = process.env.PRIVATE_KEY?.trim();
+  if (pk) {
+    return [pk.startsWith("0x") ? pk : `0x${pk}`];
+  }
+  return { mnemonic: MNEMONIC };
+}
+
+const sepoliaUrl = process.env.SEPOLIA_RPC_URL?.trim();
+if (!sepoliaUrl && process.env.HARDHAT_NETWORK === "sepolia") {
+  throw new Error("SEPOLIA_RPC_URL is required for the sepolia network (set in env, never commit)");
+}
 
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   namedAccounts: {
     deployer: 0,
   },
+  sourcify: {
+    enabled: true,
+    apiUrl: "https://sourcify.dev/server",
+    browserUrl: "https://repo.sourcify.dev",
+  },
   etherscan: {
+    enabled: false,
     apiKey: {
-      sepolia: vars.get("ETHERSCAN_API_KEY", ""),
+      sepolia: process.env.ETHERSCAN_API_KEY || vars.get("ETHERSCAN_API_KEY", ""),
     },
   },
   gasReporter: {
@@ -48,13 +64,9 @@ const config: HardhatUserConfig = {
       url: "http://localhost:8545",
     },
     sepolia: {
-      accounts: {
-        mnemonic: MNEMONIC,
-        path: "m/44'/60'/0'/0/",
-        count: 10,
-      },
+      accounts: sepoliaAccounts(),
       chainId: 11155111,
-      url: `https://sepolia.infura.io/v3/${INFURA_API_KEY}`,
+      url: sepoliaUrl || "http://127.0.0.1:0",
     },
   },
   paths: {
