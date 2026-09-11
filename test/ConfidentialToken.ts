@@ -133,4 +133,54 @@ describe("ConfidentialToken (ERC7984)", function () {
       ).to.be.rejected;
     });
   });
+
+  describe("threshold proof (Milestone 2)", function () {
+    const THRESHOLD = 500n;
+
+    it("verifier decrypts ebool true when balance >= threshold, cannot decrypt balance", async function () {
+      const tx = await token.connect(signers.owner).proveThreshold(signers.other.address, Number(THRESHOLD));
+      await tx.wait();
+
+      const proofHandle = await token.thresholdProofOf(signers.owner.address, signers.other.address);
+      expect(proofHandle).to.not.eq(ethers.ZeroHash);
+
+      const clears = await fhevm.userDecryptEbool(proofHandle, tokenAddress, signers.other);
+      expect(clears).to.eq(true);
+
+      const balanceHandle = await token.confidentialBalanceOf(signers.owner.address);
+      await expect(
+        fhevm.userDecryptEuint(FhevmType.euint64, balanceHandle, tokenAddress, signers.other),
+      ).to.be.rejected;
+    });
+
+    it("verifier decrypts ebool false when balance < threshold, cannot decrypt balance", async function () {
+      await (await token.connect(signers.owner).mint(signers.recipient.address, 100)).wait();
+
+      const tx = await token
+        .connect(signers.recipient)
+        .proveThreshold(signers.other.address, Number(THRESHOLD));
+      await tx.wait();
+
+      const proofHandle = await token.thresholdProofOf(
+        signers.recipient.address,
+        signers.other.address,
+      );
+      const clears = await fhevm.userDecryptEbool(proofHandle, tokenAddress, signers.other);
+      expect(clears).to.eq(false);
+
+      const balanceHandle = await token.confidentialBalanceOf(signers.recipient.address);
+      await expect(
+        fhevm.userDecryptEuint(FhevmType.euint64, balanceHandle, tokenAddress, signers.other),
+      ).to.be.rejected;
+    });
+
+    it("address NOT granted the ebool cannot decrypt the proof", async function () {
+      await (await token.connect(signers.owner).proveThreshold(signers.other.address, Number(THRESHOLD))).wait();
+      const proofHandle = await token.thresholdProofOf(signers.owner.address, signers.other.address);
+
+      await expect(
+        fhevm.userDecryptEbool(proofHandle, tokenAddress, signers.recipient),
+      ).to.be.rejected;
+    });
+  });
 });
