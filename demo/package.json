@@ -1,0 +1,23 @@
+{
+  "name": "liquid-logic-x-demo",
+  "private": true,
+  "version": "0.3.0",
+  "type": "module",
+  "description": "Milestone 3 — Sepolia threshold proof demo UI for Liquid Logic X",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview --base /demo/"
+  },
+  "dependencies": {
+    "@zama-fhe/sdk": "3.5.1",
+    "ethers": "^6.16.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^6.3.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
