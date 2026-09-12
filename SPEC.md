@@ -127,7 +127,7 @@ yields an `ebool`, and `FHE.allow` grants the verifier ACL on that comparison re
 Acceptance: verifier decrypts the `ebool` (learns whether `balance >= threshold`) and
 **cannot** decrypt the balance handle. Audited fhEVM ops only — no custom cryptography.
 
-### Core interface (draft)
+### Core interface (crew brief — see `docs/crew-allowance.md`)
 
 ```solidity
 function setAllowance(address agent, externalEuint64 amount, bytes calldata proof) external;
@@ -140,9 +140,15 @@ function grantView(address auditor, address agent) external;
 function allowanceOf(address agent) external view returns (euint64);
 ```
 
-`spend` must fail closed. An agent attempting to exceed its allowance results in a
-no-op transfer, not a revert that leaks the comparison result — the failure itself is
-information.
+Hard requirements for implementers:
+
+- **`setAllowance`:** cap is an `euint`; ACL to the **principal only** — never the agent.
+- **`spend`:** fail **closed and silent** — no revert on overspend, no outcome-differentiated
+  events, no intentional gas / control-flow oracle an agent can use to learn the cap.
+- **`revoke`:** immediate, single tx.
+- **`grantView`:** principal delegates read on the **balance**, not the **cap**.
+- **Test that matters:** an agent trying to binary-search its own cap by spending must be
+  unable to distinguish success from failure.
 
 ---
 
@@ -170,12 +176,12 @@ problem not worth fighting in v1.
 |---|---|---|
 | 0 | Feasibility — Zama fhEVM on Sepolia | ✅ Done |
 | 1 | Confidential balance + ACL, 4/4 tests | ✅ Merged (PR #2) |
-| 2 | Sepolia deploy + Sourcify verification + deploy docs | ✅ Merged (PR #3) |
-| 2b | Threshold viewing key — decrypt `ebool` (`balance >= threshold`), not the balance | In progress |
-| 3 | `setAllowance` / `spend` / `revoke` + tests | Next |
-| 4 | Auditor grants on allowances / proofs (as needed) | |
+| 2 | Sepolia deploy + Sourcify (+ later Etherscan) | ✅ Done |
+| 2b | Threshold viewing key — decrypt `ebool`, not the balance | ✅ Merged (PR #4) + Sepolia M2 |
+| 3 | Threshold demo UI at `/demo` (GitHub Pages) | ✅ Merged (PR #7 / #8) |
+| 4 | `setAllowance` / silent `spend` / `revoke` / balance-only `grantView` + binary-search test | Next — `docs/crew-allowance.md` |
 | 5 | Wrap / unwrap at the plaintext boundary | |
-| 6 | Reference agent — an agent that pays from an allowance end to end | |
+| 6 | Reference agent — pays from an allowance end to end | |
 
 Milestone 6 is the one that proves the thesis. Everything before it is plumbing.
 
@@ -186,7 +192,7 @@ Milestone 6 is the one that proves the thesis. Everything before it is plumbing.
 **Licensing.** Zama's libraries are BSD-3-Clause-Clear — free for development,
 research, prototyping and experimentation only. Any commercial use requires a patent
 licence from Zama (hello@zama.ai). This must be resolved before any revenue product or
-mainnet deployment. It is not a blocker for milestones 3–6.
+mainnet deployment. It is not a blocker for remaining testnet milestones.
 
 **Cost.** 1 $ZAMA per encrypted input proof, 75/day from the testnet faucet. Enough for
 development; a constraint on test suite size.
