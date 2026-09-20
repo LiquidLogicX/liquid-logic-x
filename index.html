@@ -69,7 +69,7 @@
     border:0;border-radius:7px;padding:10px 18px;cursor:pointer}
   button.flip:hover{filter:brightness(1.12)}
   button.flip:focus-visible{outline:2px solid var(--liquid-hi);outline-offset:3px}
-  .note{margin:0;font-size:14px;color:var(--muted)}
+  .note{margin:0;font-size:14px;color:var(--muted)}.tag{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--edge);border-radius:999px;padding:3px 9px;vertical-align:middle;margin-left:8px}
 
   h2{margin:62px 0 0;font-size:13px;font-weight:600;color:var(--liquid-hi);
      letter-spacing:0.01em}
@@ -186,7 +186,8 @@
     without ever learning the amounts.</dd>
   </dl>
 
-  <h2>A swap, as the chain sees it</h2><div class="rule"></div>
+  <h2>A swap, as the chain sees it <span class="tag">roadmap</span></h2><div class="rule"></div>
+<p class="note">Not yet built. This describes how private swaps are designed to work, not something live today.</p>
   <div class="swap">
     <div class="leg"><span class="who">Maker sends</span><span class="val">4f2a…d19c</span></div>
     <div class="arrow">↓</div>
@@ -195,7 +196,8 @@
     nothing. The amounts were never exposed.</div>
   </div>
 
-  <h2>How that works</h2><div class="rule"></div>
+  <h2>How that works <span class="tag">roadmap</span></h2><div class="rule"></div>
+<p class="note">Not yet built. This is the designed flow for private swaps, not something live today.</p>
   <ol>
     <li><strong>Submit.</strong> Both sides send encrypted amounts. Neither the network
     nor an observer sees the figures.</li>
