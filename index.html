@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Liquid Logic X</title>
+<style>
+  :root{
+    --void:#08090C;
+    --panel:#111318;
+    --panel-2:#161920;
+    --edge:#242830;
+    --liquid:#6E5AA8;
+    --brand:#8B5CF6;
+    --liquid-hi:#A89CC8;
+    --chrome:#DCE0E8;
+    --chrome-dim:#9AA0AE;
+    --muted:#7B818F;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--void);color:var(--chrome);
+    font-family:var(--sans);font-size:17px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:680px;margin:0 auto;padding:0 22px}
+
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:34px 0 0}
+  .mark{display:flex;align-items:center;gap:11px}
+  .mark .logo{display:block}
+  .mark span{font-size:15px;font-weight:600;letter-spacing:-0.01em}
+  .mark .x{font-style:normal;color:var(--brand)}
+  .tag{font-family:var(--mono);font-size:11px;color:var(--muted);
+       border:1px solid var(--edge);border-radius:99px;padding:4px 11px}
+
+
+  /* masthead */
+  .mast{margin:30px 0 0}
+  .mast-rule{height:2px;width:46px;background:var(--brand);border-radius:2px}
+  .mast-line{margin:16px 0 0;font-size:15px;font-weight:600;color:var(--chrome);letter-spacing:-0.01em}
+  .mast-sub{margin:3px 0 0;font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+  .roadmap{font-family:var(--mono);font-size:10.5px;font-weight:400;letter-spacing:.04em;
+       text-transform:uppercase;color:var(--muted);border:1px solid var(--edge);
+       border-radius:99px;padding:3px 9px;vertical-align:middle;margin-left:9px}
+
+  .hero{margin:46px 0 0}
+  h1{margin:0;font-size:34px;line-height:1.14;letter-spacing:-0.03em;max-width:19ch;font-weight:680}
+  .sub{margin:18px 0 0;font-size:17px;line-height:1.6;color:var(--chrome-dim);max-width:54ch}
+
+  /* ledger */
+  .ledger{margin:40px 0 0;background:var(--panel);border:1px solid var(--edge);border-radius:10px;overflow:hidden}
+  .lhead{display:grid;grid-template-columns:1fr auto;gap:14px;padding:11px 18px;
+         background:var(--panel-2);border-bottom:1px solid var(--edge);
+         font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .row{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+       padding:14px 18px;border-bottom:1px solid var(--edge)}
+  .row:last-child{border-bottom:0}
+  .addr{font-family:var(--mono);font-size:13px;color:var(--muted);
+        overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .addr.you{color:var(--chrome)}
+  .amt{font-family:var(--mono);font-size:14.5px;font-variant-numeric:tabular-nums;
+       text-align:right;min-width:11ch;padding:3px 9px;border-radius:4px}
+  .amt.sealed{
+    color:rgba(196,201,214,.88);
+    background:linear-gradient(110deg,#191C23 0%,#252932 40%,#30353F 50%,#252932 60%,#191C23 100%);
+    background-size:260% 100%;
+    user-select:none;
+    box-shadow:inset 0 0 0 1px rgba(220,224,232,.13);
+  }
+  .amt.open{color:var(--chrome);background:rgba(220,224,232,.07);
+            box-shadow:inset 0 0 0 1px rgba(220,224,232,.14)}
+
+  .ctl{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0 0}
+  button.flip{
+    font:inherit;font-size:14px;font-weight:600;color:#fff;
+    background:#2B2F3A;box-shadow:inset 0 0 0 1px #3A3F4C;
+    border:0;border-radius:7px;padding:10px 18px;cursor:pointer}
+  button.flip:hover{background:#333846}
+  button.flip:focus-visible{outline:2px solid var(--liquid-hi);outline-offset:3px}
+  .note{margin:0;font-size:14px;color:var(--muted)}
+
+  h2{margin:66px 0 0;font-size:11.5px;font-weight:600;color:var(--chrome-dim);
+     letter-spacing:0.09em;text-transform:uppercase}
+  .rule{height:1px;background:var(--edge);margin:9px 0 0}
+
+  dl{margin:0}
+  dt{margin:24px 0 0;font-size:17px;font-weight:600}
+  dd{margin:5px 0 0;color:var(--chrome-dim);max-width:58ch}
+
+  /* swap */
+  .swap{margin:22px 0 0;background:var(--panel);border:1px solid var(--edge);
+        border-radius:10px;padding:18px}
+  .leg{display:flex;align-items:center;justify-content:space-between;gap:12px;
+       padding:12px 14px;background:var(--panel-2);border-radius:7px}
+  .leg .who{font-size:14px;color:var(--chrome-dim)}
+  .leg .val{font-family:var(--mono);font-size:13.5px;color:rgba(196,201,214,.9);
+            padding:2px 8px;border-radius:4px;background:rgba(220,224,232,.06);
+            box-shadow:inset 0 0 0 1px rgba(220,224,232,.13)}
+  .arrow{display:flex;justify-content:center;color:var(--muted);font-size:16px;padding:7px 0}
+  .verdict{margin:14px 0 0;padding:12px 14px;border-radius:7px;
+           background:rgba(220,224,232,.04);border:1px solid var(--edge);
+           font-size:14px;color:var(--chrome-dim)}
+  .verdict b{color:var(--chrome);font-weight:600}
+
+  ol{margin:14px 0 0;padding:0;list-style:none;counter-reset:s}
+  ol li{counter-increment:s;position:relative;padding:13px 0 13px 34px;
+        border-bottom:1px solid var(--edge);color:var(--chrome-dim);max-width:58ch}
+  ol li::before{content:counter(s);position:absolute;left:0;top:14px;
+        font-family:var(--mono);font-size:12px;color:var(--muted)}
+  ol li strong{color:var(--chrome);font-weight:600}
+
+  .status{margin:20px 0 0;padding:16px 18px;border-left:2px solid var(--edge);
+          background:var(--panel);border-radius:0 7px 7px 0;max-width:58ch}
+  .status p{margin:0;font-size:15px;color:var(--chrome-dim)}
+  .status p+p{margin-top:10px}
+
+  footer{margin:64px 0 0;padding:18px 0 44px;border-top:1px solid var(--edge);
+         display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
+         font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+  @media (max-width:520px){
+    body{font-size:16px}
+    h1{font-size:26px}
+    .amt{font-size:13px;min-width:9ch}
+    .addr{font-size:12px}
+    .row,.lhead{padding-left:14px;padding-right:14px}
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .amt{transition:color .2s ease,background-color .2s ease,box-shadow .2s ease}
+    .amt.sealed{animation:flow 14s linear infinite}
+    @keyframes flow{0%{background-position:0% 0}100%{background-position:-260% 0}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="mark">
+      <img class="logo" src="data:image/png;base64,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" width="24" height="24" alt="" aria-hidden="true">
+      <span>Liquid Logic <em class="x">X</em></span>
+    </div>
+    <span class="tag">live on sepolia · testnet</span>
+  </div>
+
+  <div class="mast">
+    <div class="mast-rule"></div>
+    <p class="mast-line">Confidential balances and threshold proofs</p>
+    <p class="mast-sub">Ethereum Sepolia · Zama fhEVM</p>
+  </div>
+
+  <div class="hero">
+    <h1>Hold and trade without publishing your position.</h1>
+    <p class="sub">Every balance on a public chain is readable by anyone. Liquid Logic X
+    encrypts balances at the contract level — holdings stay sealed by default, and the
+    holder decides who can open them.</p>
+  </div>
+
+  <div class="ledger" aria-label="Example holdings">
+    <div class="lhead"><span>holder</span><span>balance</span></div>
+    <div class="row">
+      <span class="addr you">your wallet</span>
+      <span class="amt open" data-real="412.80" data-seal="c7f2a1e9" data-you="1">412.80</span>
+    </div>
+    <div class="row">
+      <span class="addr">0x7b1c…4e02</span>
+      <span class="amt sealed" data-real="1,204.55" data-seal="9ab3f07d">9ab3f07d</span>
+    </div>
+    <div class="row">
+      <span class="addr">0xd490…a7f1</span>
+      <span class="amt sealed" data-real="86.20" data-seal="41e8c26b">41e8c26b</span>
+    </div>
+    <div class="row">
+      <span class="addr">0x22fe…90bc</span>
+      <span class="amt sealed" data-real="9,730.00" data-seal="e05d1934">e05d1934</span>
+    </div>
+  </div>
+
+    <p class="note">Illustrative data — not live balances.</p>
+
+  <div class="ctl">
+    <button class="flip" id="flip" type="button">Show what a public chain sees</button>
+    <p class="note" id="note">You can open your own balance. Nobody else can.</p>
+  </div>
+
+  <h2>What is live</h2><div class="rule"></div>
+  <dl>
+    <dt>Confidential balances</dt>
+    <dd>Amounts are stored encrypted onchain. An explorer shows that an account holds
+    something, not how much. Grant a counterparty, an auditor, or a tax preparer the key
+    to decrypt yours — and revoke it.</dd>
+  </dl>
+
+  <h2>Roadmap — not yet built</h2><div class="rule"></div>
+  <dl>
+    <dt>Private swaps</dt>
+    <dd>Trades settle without revealing size. The chain confirms the trade is valid
+    without ever learning the amounts.</dd>
+  </dl>
+
+  <h2>A swap, as the chain sees it <span class="roadmap">roadmap</span></h2><div class="rule"></div>
+<p class="note">Not yet built. This describes how private swaps are designed to work, not something live today.</p>
+  <div class="swap">
+    <div class="leg"><span class="who">Maker sends</span><span class="val">4f2a…d19c</span></div>
+    <div class="arrow">↓</div>
+    <div class="leg"><span class="who">Taker sends</span><span class="val">b83e…07a5</span></div>
+    <div class="verdict"><b>Valid.</b> Inputs equal outputs. Nothing was created from
+    nothing. The amounts were never exposed.</div>
+  </div>
+
+  <h2>How that works <span class="roadmap">roadmap</span></h2><div class="rule"></div>
+  <ol>
+    <li><strong>Submit.</strong> Both sides send encrypted amounts. Neither the network
+    nor an observer sees the figures.</li>
+    <li><strong>Verify.</strong> The contract proves the trade balances while the amounts
+    stay encrypted throughout.</li>
+    <li><strong>Settle.</strong> Encrypted balances update. The transaction is public and
+    auditable; the numbers inside it are not.</li>
+  </ol>
+
+  <h2>Where this stands</h2><div class="rule"></div>
+  <div class="status">
+    <p>The confidential balance contract is <strong>live on Ethereum Sepolia</strong> and
+    source-verified. Balances are encrypted at the contract level; an address without
+    permission cannot read them.</p>
+    <p>A threshold proof also works: a verifier can learn whether a balance clears a given
+    figure without learning the balance itself. Contract:
+    <a href="https://sepolia.etherscan.io/address/0x1132E6b5Cafe10990879Eed95e4bf10179DE9c7a#code">0x1132…DE9c7a</a>.</p>
+    <p>Testnet only — no real assets, no mainnet deployment, no audit. The agent interface
+    described above is not built yet.</p>
+  </div>
+
+  <footer><span>Liquid Logic X</span><span>testnet build · September 2026</span></footer>
+</div>
+
+<script>
+(function(){
+  var btn=document.getElementById('flip'),note=document.getElementById('note');
+  var cells=[].slice.call(document.querySelectorAll('.amt')),open=false;
+  btn.addEventListener('click',function(){
+    open=!open;
+    cells.forEach(function(el){
+      var mine=el.dataset.you==='1';
+      if(open||mine){
+        el.textContent=el.dataset.real;
+        el.classList.remove('sealed');el.classList.add('open');
+      }else{
+        el.textContent=el.dataset.seal;
+        el.classList.remove('open');el.classList.add('sealed');
+      }
+    });
+    btn.textContent=open?'Seal the amounts again':'Show what a public chain sees';
+    note.textContent=open
+      ?'On an ordinary chain, every one of these is readable by anyone.'
+      :'You can open your own balance. Nobody else can.';
+  });
+})();
+</script>
+</body>
+</html>
