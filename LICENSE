@@ -1,3 +1,5 @@
+Copyright © 2026 Liquid Logic X LLC. All rights reserved except as licensed below.
+
 Business Source License 1.1
 
 License text copyright (c) 2017 MariaDB Corporation Ab, All Rights Reserved.
@@ -9,13 +11,16 @@ Parameters
 
 Licensor:             Liquid Logic X LLC
 
-Licensed Work:        LLX confidential-token contracts (contracts/ in this repository)
+Licensed Work:        Liquid Logic X LLC's original code in this repository.
+                      Excludes contracts/ConfidentialToken.sol, which keeps
+                      Zama's BSD-3-Clause-Clear header, and third-party code,
+                      which keeps its own licenses.
                       The Licensed Work is (c) 2026 Liquid Logic X LLC
 
 Additional Use Grant: None. Non-production evaluation use only, as
                       permitted by the Terms below.
 
-Change Date:          2028-10-17
+Change Date:          2030-10-15
 
 Change License:       MIT License
 
