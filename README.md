@@ -45,3 +45,9 @@ Tests run in **Hardhat local mock FHE mode** only. Do not deploy to Sepolia for 
 
 Public throwaway Sepolia address: see `FUNDING_ADDRESS.txt`.
 Private key is kept outside git (never committed).
+
+## License
+
+The contracts in this repository are licensed under the Business Source License 1.1 (see [LICENSE](LICENSE)). Licensor: Liquid Logic X LLC. Additional Use Grant: none (non-production evaluation only). Change Date: 2028-10-17 (provisional), after which the Licensed Work is available under the MIT License. This is source-available, not open source, until the Change Date.
+
+`contracts/ConfidentialToken.sol` currently carries an `SPDX-License-Identifier: BSD-3-Clause-Clear` header, which is unchanged. The BUSL header applies from the next contract version. Third-party dependencies (Zama FHEVM, OpenZeppelin confidential contracts) keep their own licenses.
